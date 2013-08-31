@@ -30,9 +30,9 @@ public class LoginActivity extends Activity{
 			@Override
 			public void onClick(View v) {
 				
-				Toast.makeText(getApplicationContext(), "Not Implemented yet!", Toast.LENGTH_LONG).show();
-				userEmail.setText("");
-				userPassword.setText("");
+				Intent i = new Intent(getApplicationContext(), AllCoursesActivity.class);
+				startActivity(i);
+				finish();
 			}
 		});
 	}
