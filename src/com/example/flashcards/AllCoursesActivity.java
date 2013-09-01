@@ -44,7 +44,7 @@ public class AllCoursesActivity extends ListActivity {
     private static final String TAG_COURSES = "courses";
     private static final String TAG_SUMMARY = "summary";
     private static final String TAG_PID = "pid";
-    private static final String TAG_NAME = "name";
+    private static final String TAG_COURSE_NAME = "name";
  
     // Courses JSONArray
     JSONArray courses = null;
@@ -70,14 +70,15 @@ public class AllCoursesActivity extends ListActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
                 // getting values from selected ListItem
-                String pid = ((TextView) view.findViewById(R.id.pid)).getText()
-                        .toString();
+                String pid = ((TextView) view.findViewById(R.id.pid)).getText().toString();
+                String course = ((TextView) view.findViewById(R.id.course)).getText().toString();
  
                 // Starting new intent
                 Intent in = new Intent(getApplicationContext(),
                         FlashcardActivity.class);
                 // sending pid to next activity
                 in.putExtra(TAG_PID, pid);
+                in.putExtra(TAG_COURSE_NAME, course);
  
                 // starting new activity and expecting some response back
                 startActivity(in);
@@ -132,7 +133,7 @@ public class AllCoursesActivity extends ListActivity {
  
                         // Storing each json item in variable
                         String id = c.getString(TAG_PID);
-                        String name = c.getString(TAG_NAME);
+                        String name = c.getString(TAG_COURSE_NAME);
                         String summary = c.getString(TAG_SUMMARY);
  
                         // creating new HashMap
@@ -140,7 +141,7 @@ public class AllCoursesActivity extends ListActivity {
  
                         // adding each child node to HashMap key => value
                         map.put(TAG_PID, id);
-                        map.put(TAG_NAME, name);
+                        map.put(TAG_COURSE_NAME, name);
                         map.put(TAG_SUMMARY, summary);
  
                         // adding HashList to ArrayList
@@ -172,7 +173,7 @@ public class AllCoursesActivity extends ListActivity {
                      * */
                     ListAdapter adapter = new SimpleAdapter(
                             AllCoursesActivity.this, coursesList,
-                            R.layout.list_item, new String[] { TAG_NAME,
+                            R.layout.list_item, new String[] { TAG_COURSE_NAME,
                                     TAG_SUMMARY},
                             new int[] { R.id.course, R.id.summary });
                     // updating listview
