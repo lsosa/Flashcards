@@ -3,20 +3,12 @@ package com.example.flashcards;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
- 
-
-
-
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
- 
-
-
-
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -32,13 +24,19 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
- 
-public class AllCoursesActivity extends ListActivity {   
-    
-    ArrayList<HashMap<String, String>> coursesList;
+
+
+
+public class LecturesActivity extends ListActivity{
+	
+	private String course_id;
+	private String course_code;
+	
+	ArrayList<HashMap<String, String>> selectedCourseLectures = new ArrayList<HashMap<String, String>>();
+	
+	ArrayList<HashMap<String, String>> coursesList;
     ArrayList<HashMap<String, String>> lecturesList;
     ArrayList<HashMap<String, String>> notesList;
-    
  
     @SuppressWarnings("unchecked")
 	@Override
@@ -52,41 +50,33 @@ public class AllCoursesActivity extends ListActivity {
         lecturesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("lectures");
         notesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("notes");
         
-        runOnUiThread(new Runnable() {
-			
-			@Override
-			public void run() {
-				ListAdapter adapter = new SimpleAdapter(
-		                AllCoursesActivity.this, coursesList,
-		                R.layout.list_item, new String[] { "id", "course_code", "friendly_name"},
-		                new int[] { R.id.elementID, R.id.elementTitle, R.id.elementSubTitle });
-				
-				// updating listview
-		        setListAdapter(adapter);
-			}
-		});        
+        course_id = i.getStringExtra("id");
+        course_code = i.getStringExtra("course_code");
         
+        //Displays the lectures corresponding to the selected course.
+        displayLectures();
         
+        setTitle(course_code + " Lectures");       
  
         // Get listview
         ListView lv = getListView();
  
-        // on seleting single course        
+        // on seleting single lecture        
         lv.setOnItemClickListener(new OnItemClickListener() {
  
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
                 // getting values from selected ListItem
-                String course_id = ((TextView) view.findViewById(R.id.elementID)).getText().toString();
-                String course = ((TextView) view.findViewById(R.id.elementTitle)).getText().toString();
+                String lecture_id = ((TextView) view.findViewById(R.id.elementID)).getText().toString();
+                String course_name = ((TextView) view.findViewById(R.id.elementTitle)).getText().toString();
  
                 // Starting new intent
                 Intent in = new Intent(getApplicationContext(),
-                        LecturesActivity.class);
+                        FlashcardActivity.class);
                 
-                in.putExtra("id", course_id);
-                in.putExtra("course_code", course);
+                in.putExtra("id", lecture_id);
+                in.putExtra("name", course_name);
                 in.putExtra("courses", coursesList);
     			in.putExtra("lectures", lecturesList);
     			in.putExtra("notes", notesList);
@@ -96,5 +86,33 @@ public class AllCoursesActivity extends ListActivity {
             }
         });
  
-    }   
+    }
+    
+    private void displayLectures(){    	
+    	
+    	
+    	for(int i = 0; i < lecturesList.size(); i++){
+    		
+    		if(lecturesList.get(i).get("courses_id").equals(course_id))
+    		{
+    			selectedCourseLectures.add(lecturesList.get(i));
+    		}
+    	}
+    	
+    	
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				ListAdapter adapter = new SimpleAdapter(
+						LecturesActivity.this, selectedCourseLectures,
+						R.layout.list_item, new String[] { "id", "name", "description" }, 
+						new int[] {R.id.elementID, R.id.elementTitle, R.id.elementSubTitle });
+
+				// updating listview
+				setListAdapter(adapter);
+			}
+		});
+    }
 }
+

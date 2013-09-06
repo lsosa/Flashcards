@@ -2,6 +2,7 @@ package com.example.flashcards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,47 +17,89 @@ import android.widget.TextView;
 public class FlashcardActivity extends Activity implements OnTouchListener{
 	
 	TextView keyword;
-	TextView definition;	
+	TextView definition;
 	
-	private String pid;
+	private int flashcardPosition = 0; 
+	
+	private String lectureID;
 	private String courseName;
 	
 	// Creating JSON Parser object
-    JSONParser jParser = new JSONParser();
+    JSONParser jParser = new JSONParser(); 
     
-    ArrayList<HashMap<String, String>> flashcards;
+    ArrayList<HashMap<String, String>> selectedNotes = new ArrayList<HashMap<String,String>>();
     
-    private GestureDetectorCompat gestureDetector;    
+    ArrayList<HashMap<String, String>> coursesList;
+    ArrayList<HashMap<String, String>> lecturesList;
+    ArrayList<HashMap<String, String>> notesList;
     
-    // url to get all notes list
-    private static String url_all_notes = "http://lsosa.web44.net/getAllCourses.php";
-    
-    // JSON Node names
-    private static final String TAG_SUCCESS = "success";
-    private static final String TAG_NOTES = "notes";
-    private static final String TAG_DEFINITION = "definition";
-    private static final String TAG_PID = "pid";
-    private static final String TAG_COURSE_NAME = "name";
-    private static final String TAG_KEYWORD = "keyword";
+    private GestureDetectorCompat gestureDetector;   
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {		
 		super.onCreate(savedInstanceState);
 		
-		// getting course details from intent
-        Intent i = getIntent();
- 
-        // getting course id (pid) from intent
-        pid = i.getStringExtra(TAG_PID);
-        courseName = i.getStringExtra(TAG_COURSE_NAME);
+		// getting lecture details from intent
+		Intent i = getIntent();
         
-		setTitle(courseName);
-		setContentView(R.layout.flashcard);
+        coursesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("courses");
+        lecturesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("lectures");
+        notesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("notes");
+ 
+        // getting lecture id from intent
+        lectureID = i.getStringExtra("id");
+        courseName = i.getStringExtra("name");       
+        
+		setTitle(courseName + " Flashcards");
+		setContentView(R.layout.flashcard);	
 		
 		gestureDetector = new GestureDetectorCompat(this, new GestureListener());
 		
 		keyword = (TextView) findViewById(R.id.keyword);
-		definition = (TextView) findViewById(R.id.definition);		
+		definition = (TextView) findViewById(R.id.definition);
+		
+		getNotesFromSelectedLecture();
+		setFirstFlashCard();
+		
+	}
+	
+	private void getNotesFromSelectedLecture(){
+		
+		for(int i = 0; i < notesList.size(); i++){
+    		
+    		if(notesList.get(i).get("lecture_id").equals(lectureID))
+    		{
+    			selectedNotes.add(lecturesList.get(i));
+    		}
+    	}
+	}
+	
+	@Override
+	protected void onPause() {		
+		super.onPause();
+		//finish();
+	}
+
+	private void setFirstFlashCard(){
+		
+		runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				//Check if we have at least one note for the lecture.
+				if(selectedNotes.size() != 0){
+					
+					keyword.setText(notesList.get(0).get("term"));
+			    	definition.setText(notesList.get(0).get("definition"));
+				}else{
+					
+					keyword.setText("No Notes :(");
+					definition.setText("Go and create some notes so that you can study!");
+				}				
+			}
+		});		
 		
 	}
 	
@@ -101,12 +144,45 @@ public class FlashcardActivity extends Activity implements OnTouchListener{
     }
 	
 	public void onSwipeRight() {
+		
+		flashcardPosition--;
+		
+		if(flashcardPosition < 0 && selectedNotes.size() != 0){
+			
+			flashcardPosition = selectedNotes.size() - 1;
+			
+			keyword.setText(notesList.get(flashcardPosition).get("term"));
+	    	definition.setText(notesList.get(flashcardPosition).get("definition"));
+		}else if(selectedNotes.size() != 0){		
+			
+			keyword.setText(notesList.get(flashcardPosition).get("term"));
+	    	definition.setText(notesList.get(flashcardPosition).get("definition"));
+		}else {
+			
+			flashcardPosition = 0;
+		}
     }
 
     public void onSwipeLeft() {
     	
-    	keyword.setText("YEA! Swipe");
-    	definition.setText("Learn how to swipe");
+    	flashcardPosition++;
+    	
+    	if(flashcardPosition < selectedNotes.size()){
+    		
+    		keyword.setText(notesList.get(flashcardPosition).get("term"));
+	    	definition.setText(notesList.get(flashcardPosition).get("definition"));
+    	}else if(selectedNotes.size() != 0){
+    		
+    		flashcardPosition = 0;
+    		
+    		keyword.setText(notesList.get(flashcardPosition).get("term"));
+	    	definition.setText(notesList.get(flashcardPosition).get("definition"));
+    	}else{
+    		
+    		flashcardPosition = 0;
+    	}
+    	
+    	
     }
 
     public void onSwipeTop() {

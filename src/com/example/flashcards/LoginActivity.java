@@ -30,7 +30,10 @@ public class LoginActivity extends Activity{
 			@Override
 			public void onClick(View v) {
 				
-				Intent i = new Intent(getApplicationContext(), AllCoursesActivity.class);
+				String users_id = "1";
+				
+				Intent i = new Intent(getApplicationContext(), Database.class);
+				i.putExtra("users_id", users_id);
 				startActivity(i);
 				finish();
 			}

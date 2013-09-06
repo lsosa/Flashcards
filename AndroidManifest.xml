@@ -31,6 +31,14 @@
             android:label="My Courses" >
         </activity>
         <activity
+            android:name="com.example.flashcards.LecturesActivity"
+            android:label="" >
+        </activity>
+        <activity
+            android:name="com.example.flashcards.Database"
+            android:label="" >
+        </activity>
+        <activity
             android:name="com.example.flashcards.FlashcardActivity"
             android:label="" >
         </activity>
