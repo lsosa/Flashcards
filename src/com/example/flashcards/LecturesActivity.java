@@ -2,20 +2,14 @@ package com.example.flashcards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -23,17 +17,20 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 
 public class LecturesActivity extends ListActivity{
-	
+
 	private String course_id;
 	private String course_code;
+	private String users_id;
+	
+	private ProgressDialog pDialog;
 	
 	ArrayList<HashMap<String, String>> selectedCourseLectures = new ArrayList<HashMap<String, String>>();
 	
+	ArrayList<ArrayList<HashMap<String, String>>> userData;
 	ArrayList<HashMap<String, String>> coursesList;
     ArrayList<HashMap<String, String>> lecturesList;
     ArrayList<HashMap<String, String>> notesList;
@@ -44,6 +41,8 @@ public class LecturesActivity extends ListActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.all_courses);
         
+        userData = new ArrayList<ArrayList<HashMap<String,String>>>();
+        
         Intent i = getIntent();
         
         coursesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("courses");
@@ -52,11 +51,13 @@ public class LecturesActivity extends ListActivity{
         
         course_id = i.getStringExtra("id");
         course_code = i.getStringExtra("course_code");
+        users_id = i.getStringExtra("users_id");
+        
+        setTitle(course_code + " Lectures");
         
         //Displays the lectures corresponding to the selected course.
-        displayLectures();
-        
-        setTitle(course_code + " Lectures");       
+        displayLectures();       
+               
  
         // Get listview
         ListView lv = getListView();
@@ -75,6 +76,7 @@ public class LecturesActivity extends ListActivity{
                 Intent in = new Intent(getApplicationContext(),
                         FlashcardActivity.class);
                 
+                in.putExtra("users_id", users_id);
                 in.putExtra("id", lecture_id);
                 in.putExtra("name", course_name);
                 in.putExtra("courses", coursesList);
@@ -88,8 +90,7 @@ public class LecturesActivity extends ListActivity{
  
     }
     
-    private void displayLectures(){    	
-    	
+    private void displayLectures(){   	
     	
     	for(int i = 0; i < lecturesList.size(); i++){
     		
@@ -99,20 +100,92 @@ public class LecturesActivity extends ListActivity{
     		}
     	}
     	
-    	
-		runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				ListAdapter adapter = new SimpleAdapter(
-						LecturesActivity.this, selectedCourseLectures,
-						R.layout.list_item, new String[] { "id", "name", "description" }, 
-						new int[] {R.id.elementID, R.id.elementTitle, R.id.elementSubTitle });
-
-				// updating listview
-				setListAdapter(adapter);
-			}
-		});
+    	if(selectedCourseLectures.size() != 0){
+    		
+			runOnUiThread(new Runnable() {
+	
+				@Override
+				public void run() {
+					ListAdapter adapter = new SimpleAdapter(
+							LecturesActivity.this, selectedCourseLectures,
+							R.layout.list_item, new String[] { "id", "name", "description" }, 
+							new int[] {R.id.elementID, R.id.elementTitle, R.id.elementSubTitle });
+	
+					// updating listview
+					setListAdapter(adapter);
+				}
+			});
+    	}else{
+    		
+    		setTitle("No" + " Lectures");
+    	}
     }
+    
+    @Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		
+    	getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+    
+    @Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		
+    	switch(item.getItemId()){
+    		
+    		case R.id.action_reload:
+    			
+    			new refreshUserData().execute();
+    			
+    			return true;
+    		default:
+    			return super.onOptionsItemSelected(item);    		
+    	}		
+	}
+    
+    private class refreshUserData extends AsyncTask<String, String, String>{
+		
+		/**
+         * Before starting background thread Show Progress Dialog
+         * */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(LecturesActivity.this);
+            pDialog.setMessage("Refreshing User Data. Please wait...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+		@Override
+		protected String doInBackground(String... arg0) {
+
+			Database d = new Database(users_id, "");
+			userData = d.LoadAllUserData();
+			
+			return null;
+		}
+		
+		/**
+         * After completing background task Dismiss the progress dialog
+         * **/
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog after getting all data
+            pDialog.dismiss();
+            
+            //Check if we have the courses, lectures, and notes for the user.
+            if(userData.size() == 3){
+            	
+            	Intent i = new Intent(getApplicationContext(), AllCoursesActivity.class);
+    			i.putExtra("users_id", users_id);
+    			i.putExtra("courses", userData.get(0));
+    			i.putExtra("lectures", userData.get(1));
+    			i.putExtra("notes", userData.get(2));
+    			startActivity(i);
+    			finish();   			
+            }           
+        }
+	}
 }
 

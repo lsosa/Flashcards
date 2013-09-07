@@ -2,33 +2,42 @@ package com.example.flashcards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class FlashcardActivity extends Activity implements OnTouchListener{
+public class FlashcardActivity extends Activity{
 	
 	TextView keyword;
 	TextView definition;
 	
-	private int flashcardPosition = 0; 
+	RelativeLayout relativeLayout;
+	
+	private int flashcardPosition = 0;
+	
+	private ProgressDialog pDialog;
 	
 	private String lectureID;
 	private String courseName;
+	private String users_id;
 	
 	// Creating JSON Parser object
     JSONParser jParser = new JSONParser(); 
     
     ArrayList<HashMap<String, String>> selectedNotes = new ArrayList<HashMap<String,String>>();
     
+    ArrayList<ArrayList<HashMap<String, String>>> userData;    
     ArrayList<HashMap<String, String>> coursesList;
     ArrayList<HashMap<String, String>> lecturesList;
     ArrayList<HashMap<String, String>> notesList;
@@ -40,45 +49,56 @@ public class FlashcardActivity extends Activity implements OnTouchListener{
 	protected void onCreate(Bundle savedInstanceState) {		
 		super.onCreate(savedInstanceState);
 		
+		userData = new ArrayList<ArrayList<HashMap<String,String>>>();
+		
 		// getting lecture details from intent
 		Intent i = getIntent();
         
         coursesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("courses");
         lecturesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("lectures");
-        notesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("notes");
- 
-        // getting lecture id from intent
+        notesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("notes"); 
+        
         lectureID = i.getStringExtra("id");
-        courseName = i.getStringExtra("name");       
+        courseName = i.getStringExtra("name");
+        users_id = i.getStringExtra("users_id");
         
 		setTitle(courseName + " Flashcards");
 		setContentView(R.layout.flashcard);	
 		
-		gestureDetector = new GestureDetectorCompat(this, new GestureListener());
+		gestureDetector = new GestureDetectorCompat(this, new GestureListener());	
 		
+		relativeLayout = (RelativeLayout) findViewById(R.id.flashcardParentView);
 		keyword = (TextView) findViewById(R.id.keyword);
-		definition = (TextView) findViewById(R.id.definition);
+		definition = (TextView) findViewById(R.id.definition);		
 		
 		getNotesFromSelectedLecture();
 		setFirstFlashCard();
 		
-	}
-	
-	private void getNotesFromSelectedLecture(){
+		setOnTouchForRelativeLayout();
 		
-		for(int i = 0; i < notesList.size(); i++){
-    		
-    		if(notesList.get(i).get("lecture_id").equals(lectureID))
-    		{
-    			selectedNotes.add(lecturesList.get(i));
-    		}
-    	}
 	}
 	
-	@Override
-	protected void onPause() {		
-		super.onPause();
-		//finish();
+	private void setOnTouchForRelativeLayout(){
+		
+		relativeLayout.setOnTouchListener(new View.OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {				
+				
+				gestureDetector.onTouchEvent(event);				
+				return true;
+			}
+		});
+	}
+	
+	private void getNotesFromSelectedLecture(){		
+		
+		for (int i = 0; i < notesList.size(); i++) {
+
+			if (notesList.get(i).get("lecture_id").equals(lectureID)) {
+				selectedNotes.add(notesList.get(i));
+			}
+		}		
 	}
 
 	private void setFirstFlashCard(){
@@ -91,8 +111,8 @@ public class FlashcardActivity extends Activity implements OnTouchListener{
 				//Check if we have at least one note for the lecture.
 				if(selectedNotes.size() != 0){
 					
-					keyword.setText(notesList.get(0).get("term"));
-			    	definition.setText(notesList.get(0).get("definition"));
+					keyword.setText(selectedNotes.get(0).get("term"));
+			    	definition.setText(selectedNotes.get(0).get("definition"));
 				}else{
 					
 					keyword.setText("No Notes :(");
@@ -190,17 +210,72 @@ public class FlashcardActivity extends Activity implements OnTouchListener{
 
     public void onSwipeBottom() {
     }
-
+	
 	@Override
-	public boolean dispatchTouchEvent(MotionEvent event) {
+	public boolean onCreateOptionsMenu(Menu menu) {
 		
-		return gestureDetector.onTouchEvent(event);
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
 	}
-
+	
 	@Override
-	public boolean onTouch(View v, MotionEvent event) {
+	public boolean onOptionsItemSelected(MenuItem item) {
 		
-		return false;
+    	switch(item.getItemId()){
+    		
+    		case R.id.action_reload:   			
+				
+				new refreshUserData().execute();
+				
+    			return true;
+    		default:
+    			return super.onOptionsItemSelected(item);    		
+    	}		
+	}
+	
+	private class refreshUserData extends AsyncTask<String, String, String>{
+		
+		/**
+         * Before starting background thread Show Progress Dialog
+         * */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(FlashcardActivity.this);
+            pDialog.setMessage("Refreshing User Data. Please wait...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+		@Override
+		protected String doInBackground(String... arg0) {
+
+			Database d = new Database(users_id, "");
+			userData = d.LoadAllUserData();
+			
+			return null;
+		}
+		
+		/**
+         * After completing background task Dismiss the progress dialog
+         * **/
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog after getting all data
+            pDialog.dismiss();
+            
+            //Check if we have the courses, lectures, and notes for the user.
+            if(userData.size() == 3){
+            	
+            	Intent i = new Intent(getApplicationContext(), AllCoursesActivity.class);
+    			i.putExtra("users_id", users_id);
+    			i.putExtra("courses", userData.get(0));
+    			i.putExtra("lectures", userData.get(1));
+    			i.putExtra("notes", userData.get(2));
+    			startActivity(i);
+    			finish();   			
+            }           
+        }
 	}
 
 }
