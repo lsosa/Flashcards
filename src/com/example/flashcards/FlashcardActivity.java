@@ -14,6 +14,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -22,18 +25,17 @@ public class FlashcardActivity extends Activity{
 	TextView keyword;
 	TextView definition;
 	
+	Animation animFadeIn, animFadeOut;
+	
 	RelativeLayout relativeLayout;
 	
-	private int flashcardPosition = 0;
+	private int flashcardPosition = 0;	
 	
 	private ProgressDialog pDialog;
 	
 	private String lectureID;
 	private String courseName;
-	private String users_id;
-	
-	// Creating JSON Parser object
-    JSONParser jParser = new JSONParser(); 
+	private String users_id;	 
     
     ArrayList<HashMap<String, String>> selectedNotes = new ArrayList<HashMap<String,String>>();
     
@@ -65,11 +67,19 @@ public class FlashcardActivity extends Activity{
 		setTitle(courseName + " Flashcards");
 		setContentView(R.layout.flashcard);	
 		
-		gestureDetector = new GestureDetectorCompat(this, new GestureListener());	
+		gestureDetector = new GestureDetectorCompat(this, new GestureListener());
+		
+		animFadeIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in);
+		animFadeOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);		
+		
+		//animFadeIn.setAnimationListener((AnimationListener) this);
+		//animFadeOut.setAnimationListener((AnimationListener) this);		
 		
 		relativeLayout = (RelativeLayout) findViewById(R.id.flashcardParentView);
 		keyword = (TextView) findViewById(R.id.keyword);
-		definition = (TextView) findViewById(R.id.definition);		
+		definition = (TextView) findViewById(R.id.definition);
+		
+		definition.setVisibility(View.INVISIBLE);
 		
 		getNotesFromSelectedLecture();
 		setFirstFlashCard();
@@ -103,23 +113,25 @@ public class FlashcardActivity extends Activity{
 
 	private void setFirstFlashCard(){
 		
-		runOnUiThread(new Runnable() {
+		//Check if we have at least one note for the lecture.
+		if(selectedNotes.size() != 0){
 			
-			@Override
-			public void run() {
-				
-				//Check if we have at least one note for the lecture.
-				if(selectedNotes.size() != 0){
-					
-					keyword.setText(selectedNotes.get(0).get("term"));
-			    	definition.setText(selectedNotes.get(0).get("definition"));
-				}else{
-					
-					keyword.setText("No Notes :(");
-					definition.setText("Go and create some notes so that you can study!");
-				}				
-			}
-		});		
+			keyword.setText(selectedNotes.get(0).get("term"));
+	    	//definition.setText(selectedNotes.get(0).get("definition"));
+		}else{
+			
+			keyword.setText("No Notes :(");
+			definition.setText("Go and create some notes so that you can study!");
+		}
+		
+//		runOnUiThread(new Runnable() {
+//			
+//			@Override
+//			public void run() {
+//				
+//								
+//			}
+//		});		
 		
 	}
 	
@@ -166,17 +178,18 @@ public class FlashcardActivity extends Activity{
 	public void onSwipeRight() {
 		
 		flashcardPosition--;
+		definition.setText("");		
 		
 		if(flashcardPosition < 0 && selectedNotes.size() != 0){
 			
 			flashcardPosition = selectedNotes.size() - 1;
 			
 			keyword.setText(notesList.get(flashcardPosition).get("term"));
-	    	definition.setText(notesList.get(flashcardPosition).get("definition"));
+			keyword.startAnimation(animFadeIn);	    	
 		}else if(selectedNotes.size() != 0){		
 			
 			keyword.setText(notesList.get(flashcardPosition).get("term"));
-	    	definition.setText(notesList.get(flashcardPosition).get("definition"));
+			keyword.startAnimation(animFadeIn);	    	
 		}else {
 			
 			flashcardPosition = 0;
@@ -186,29 +199,47 @@ public class FlashcardActivity extends Activity{
     public void onSwipeLeft() {
     	
     	flashcardPosition++;
+    	definition.setText("");    	   	
     	
     	if(flashcardPosition < selectedNotes.size()){
     		
     		keyword.setText(notesList.get(flashcardPosition).get("term"));
-	    	definition.setText(notesList.get(flashcardPosition).get("definition"));
+    		keyword.startAnimation(animFadeIn);	    	
     	}else if(selectedNotes.size() != 0){
     		
-    		flashcardPosition = 0;
-    		
+    		flashcardPosition = 0;    		
     		keyword.setText(notesList.get(flashcardPosition).get("term"));
-	    	definition.setText(notesList.get(flashcardPosition).get("definition"));
+    		keyword.startAnimation(animFadeIn);	    	
     	}else{
     		
     		flashcardPosition = 0;
-    	}
-    	
-    	
+    	}   	
     }
 
     public void onSwipeTop() {
     }
 
     public void onSwipeBottom() {
+    	
+    	
+    	if(selectedNotes.size() != 0){
+    		
+    		if(definition.getText().equals("")){    			
+    			
+    			keyword.setText("");
+    			definition.setText(notesList.get(flashcardPosition).get("definition"));
+    			keyword.startAnimation(animFadeOut);    			
+    			definition.startAnimation(animFadeIn);   			
+    			
+    		}else if(keyword.getText().equals("")){
+    			
+    			keyword.setText(notesList.get(flashcardPosition).get("term"));
+    			definition.setText("");
+    			definition.startAnimation(animFadeOut);
+    			keyword.startAnimation(animFadeIn); 			
+    			
+    		}
+    	}
     }
 	
 	@Override
