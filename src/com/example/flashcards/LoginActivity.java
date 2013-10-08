@@ -6,11 +6,13 @@ import java.util.HashMap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 import android.view.View;
 
 public class LoginActivity extends Activity{
@@ -22,7 +24,7 @@ public class LoginActivity extends Activity{
 	
 	ArrayList<ArrayList<HashMap<String, String>>> userData;
 	
-	private Context loginActivity;
+	private Context loginActivity = this;
 	private Boolean isUserAuthenticated;	
 	private String users_id;
 
@@ -52,7 +54,7 @@ public class LoginActivity extends Activity{
 					new getAllUserData().execute();					
 				}else{
 					
-					//To Do: say something about wrong username or password.
+					new AlertDialog.Builder(loginActivity).setTitle("Login Error").setMessage("Incorrect username or password").setNeutralButton("OK", null).show();
 				}				
 			}
 		});
@@ -61,6 +63,7 @@ public class LoginActivity extends Activity{
 	private Boolean logInUser(){
 		
 		return true;
+		//return false;
 	}
 	
 	private class getAllUserData extends AsyncTask<String, String, String>{
