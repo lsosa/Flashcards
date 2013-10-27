@@ -2,7 +2,6 @@ package com.example.flashcards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
@@ -14,6 +13,7 @@ import android.graphics.Color;
 import android.widget.Button;
 import android.widget.EditText;
 import android.view.View;
+import com.togonotes.flashcards.R;
 
 public class LoginActivity extends Activity{
 	

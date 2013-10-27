@@ -2,7 +2,6 @@ package com.example.flashcards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -17,6 +16,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import com.togonotes.flashcards.R;
  
 public class AllCoursesActivity extends ListActivity {
 

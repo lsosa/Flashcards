@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.view.View;
 import android.widget.Toast;
+import com.togonotes.flashcards.R;
 
 
 public class MainActivity extends Activity {

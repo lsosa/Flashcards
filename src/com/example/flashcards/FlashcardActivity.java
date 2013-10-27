@@ -2,7 +2,6 @@ package com.example.flashcards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -18,6 +17,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.togonotes.flashcards.R;
 
 public class FlashcardActivity extends Activity{
 	
