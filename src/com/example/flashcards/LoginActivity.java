@@ -10,23 +10,22 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 import android.view.View;
 
 public class LoginActivity extends Activity{
 	
-	private EditText userEmail, userPassword;
+	private EditText userName, userPassword;
 	private Button bLogin;
 	
 	private ProgressDialog pDialog;
 	
 	ArrayList<ArrayList<HashMap<String, String>>> userData;
 	
-	private Context loginActivity = this;
-	private Boolean isUserAuthenticated;	
-	private String users_id;
+	private Context loginActivity = this;		
+	private String api_key = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {		
@@ -35,7 +34,7 @@ public class LoginActivity extends Activity{
 		
 		userData = new ArrayList<ArrayList<HashMap<String,String>>>();
 		
-		userEmail = (EditText) findViewById(R.id.userEmail);
+		userName = (EditText) findViewById(R.id.userName);
 		userPassword = (EditText) findViewById(R.id.userPassword);
 		
 		bLogin = (Button) findViewById(R.id.bSubmitLogin);
@@ -45,28 +44,59 @@ public class LoginActivity extends Activity{
 			@Override
 			public void onClick(View v) {
 				
-				users_id = "1";
-				
-				isUserAuthenticated = logInUser();
-				
-				if(isUserAuthenticated){
+				if(userName.getText().toString().equals("")){
 					
-					new getAllUserData().execute();					
+					userName.setHintTextColor(Color.RED);
+					userName.setHint("Enter username");					
+				}else if(userPassword.getText().toString().equals("")){
+					
+					userPassword.setHintTextColor(Color.RED);;
+					userPassword.setHint("Enter password");
 				}else{
 					
-					new AlertDialog.Builder(loginActivity).setTitle("Login Error").setMessage("Incorrect username or password").setNeutralButton("OK", null).show();
-				}				
+					new AuthUser().execute();
+				}							
 			}
 		});
 	}
 	
-	private Boolean logInUser(){
+	private class AuthUser extends AsyncTask<String, String, String>{
 		
-		return true;
-		//return false;
+		@Override
+		protected void onPreExecute() {			
+			super.onPreExecute();
+            pDialog = new ProgressDialog(LoginActivity.this);
+            pDialog.setMessage("Login in. Please wait...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			
+			api_key = Database.getInstance().LoginUser(userName.getText().toString(), userPassword.getText().toString());
+			
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			
+			pDialog.dismiss();
+			
+			if(!api_key.equals("")){
+				
+				new GetAllUserData().execute();
+			}else{
+				
+				new AlertDialog.Builder(loginActivity).setTitle("Login Error").setMessage("Incorrect username or password").setNeutralButton("OK", null).show();
+			}
+		}	
+		
 	}
 	
-	private class getAllUserData extends AsyncTask<String, String, String>{
+	private class GetAllUserData extends AsyncTask<String, String, String>{
 		
 		/**
          * Before starting background thread Show Progress Dialog
@@ -84,8 +114,7 @@ public class LoginActivity extends Activity{
 		@Override
 		protected String doInBackground(String... arg0) {
 
-			Database d = new Database(users_id, "");
-			userData = d.LoadAllUserData();
+			userData = Database.getInstance().LoadAllUserData();
 			
 			return null;
 		}
@@ -95,19 +124,11 @@ public class LoginActivity extends Activity{
          * **/
         protected void onPostExecute(String file_url) {
             // dismiss the dialog after getting all data
-            pDialog.dismiss();
-            
-            //Check if we have the courses, lectures, and notes for the user.
-            if(userData.size() == 3){
+            pDialog.dismiss();         
             	
-            	Intent i = new Intent(getApplicationContext(), AllCoursesActivity.class);
-    			i.putExtra("users_id", users_id);
-    			i.putExtra("courses", userData.get(0));
-    			i.putExtra("lectures", userData.get(1));
-    			i.putExtra("notes", userData.get(2));
-    			startActivity(i);
-    			finish();
-            }           
+            Intent i = new Intent(getApplicationContext(), AllCoursesActivity.class);   		
+    		startActivity(i);
+    		finish();                      
         }
 	}
 	

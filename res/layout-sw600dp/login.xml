@@ -4,22 +4,22 @@
     android:layout_height="match_parent" >
     
     <TextView
-        android:id="@+id/tvUserEmail"
+        android:id="@+id/tvUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"        
-        android:layout_alignLeft="@+id/userEmail"
+        android:layout_alignLeft="@+id/userName"
         android:layout_marginTop="50dp"
-        android:text="Email:"
+        android:text="Username:"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
-        android:id="@+id/userEmail"
+        android:id="@+id/userName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"        
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/tvUserEmail"
+        android:layout_below="@+id/tvUserName"
         android:layout_marginTop="5dp"
-        android:hint="example@hotmail.com"
+        android:hint="Galactic"
         android:ems="10"        
         android:inputType="textEmailAddress" >
 
@@ -31,8 +31,8 @@
         android:id="@+id/tvUserPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/userEmail"
-        android:layout_below="@+id/userEmail"
+        android:layout_alignLeft="@+id/userName"
+        android:layout_below="@+id/userName"
         android:layout_marginTop="10dp"
         android:text="Password:"
         android:textAppearance="?android:attr/textAppearanceMedium" />

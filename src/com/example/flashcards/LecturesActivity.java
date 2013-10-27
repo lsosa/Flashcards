@@ -23,20 +23,17 @@ import android.widget.TextView;
 public class LecturesActivity extends ListActivity{
 
 	private String course_id;
-	private String course_code;
-	private String users_id;
+	private String course_code;	
 	
 	private ProgressDialog pDialog;
 	
 	ArrayList<HashMap<String, String>> selectedCourseLectures = new ArrayList<HashMap<String, String>>();
 	
-	ArrayList<ArrayList<HashMap<String, String>>> userData;
-	ArrayList<HashMap<String, String>> coursesList;
+	ArrayList<ArrayList<HashMap<String, String>>> userData;	
     ArrayList<HashMap<String, String>> lecturesList;
-    ArrayList<HashMap<String, String>> notesList;
+    
  
-    @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.all_courses);
@@ -45,19 +42,17 @@ public class LecturesActivity extends ListActivity{
         
         Intent i = getIntent();
         
-        coursesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("courses");
-        lecturesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("lectures");
-        notesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("notes");
+        userData = Database.getInstance().getUserData();
+        
+        lecturesList = userData.get(1);       
         
         course_id = i.getStringExtra("id");
-        course_code = i.getStringExtra("course_code");
-        users_id = i.getStringExtra("users_id");
+        course_code = i.getStringExtra("course_code");        
         
         setTitle(course_code + " Lectures");
         
         //Displays the lectures corresponding to the selected course.
-        displayLectures();       
-               
+        displayLectures();              
  
         // Get listview
         ListView lv = getListView();
@@ -74,14 +69,10 @@ public class LecturesActivity extends ListActivity{
  
                 // Starting new intent
                 Intent in = new Intent(getApplicationContext(),
-                        FlashcardActivity.class);
+                        FlashcardActivity.class);                
                 
-                in.putExtra("users_id", users_id);
                 in.putExtra("id", lecture_id);
-                in.putExtra("name", course_name);
-                in.putExtra("courses", coursesList);
-    			in.putExtra("lectures", lecturesList);
-    			in.putExtra("notes", notesList);
+                in.putExtra("name", course_name);               
  
                 // starting new activity 
                 startActivity(in);
@@ -161,8 +152,7 @@ public class LecturesActivity extends ListActivity{
 		@Override
 		protected String doInBackground(String... arg0) {
 
-			Database d = new Database(users_id, "");
-			userData = d.LoadAllUserData();
+			userData = Database.getInstance().LoadAllUserData();
 			
 			return null;
 		}
@@ -172,19 +162,11 @@ public class LecturesActivity extends ListActivity{
          * **/
         protected void onPostExecute(String file_url) {
             // dismiss the dialog after getting all data
-            pDialog.dismiss();
+            pDialog.dismiss();          
             
-            //Check if we have the courses, lectures, and notes for the user.
-            if(userData.size() == 3){
-            	
-            	Intent i = new Intent(getApplicationContext(), AllCoursesActivity.class);
-    			i.putExtra("users_id", users_id);
-    			i.putExtra("courses", userData.get(0));
-    			i.putExtra("lectures", userData.get(1));
-    			i.putExtra("notes", userData.get(2));
-    			startActivity(i);
-    			finish();   			
-            }           
+    		lecturesList = userData.get(1);   		
+    		selectedCourseLectures.clear();   		
+    		displayLectures();                      
         }
 	}
 }

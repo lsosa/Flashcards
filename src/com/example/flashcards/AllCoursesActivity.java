@@ -21,29 +21,20 @@ import android.widget.TextView;
 public class AllCoursesActivity extends ListActivity {
 
 	ArrayList<ArrayList<HashMap<String, String>>> userData;
-	ArrayList<HashMap<String, String>> coursesList;
-    ArrayList<HashMap<String, String>> lecturesList;
-    ArrayList<HashMap<String, String>> notesList;
+	ArrayList<HashMap<String, String>> coursesList;   
     
-    private String users_id;
+    private ProgressDialog pDialog; 
     
-    private ProgressDialog pDialog;
- 
-    @SuppressWarnings("unchecked")
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.all_courses);
         
-        userData = new ArrayList<ArrayList<HashMap<String,String>>>();
+        userData = new ArrayList<ArrayList<HashMap<String,String>>>();       
         
-        Intent i = getIntent();
+        userData = Database.getInstance().getUserData();
         
-        coursesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("courses");
-        lecturesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("lectures");
-        notesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("notes");
-        
-        users_id = i.getStringExtra("users_id");
+        coursesList = userData.get(0);           
         
         setCoursesListAdapter();              
  
@@ -61,14 +52,10 @@ public class AllCoursesActivity extends ListActivity {
                 String course = ((TextView) view.findViewById(R.id.elementTitle)).getText().toString();
  
                 // Starting new intent
-                Intent in = new Intent(getApplicationContext(), LecturesActivity.class);
+                Intent in = new Intent(getApplicationContext(), LecturesActivity.class);                
                 
-                in.putExtra("users_id", users_id);
                 in.putExtra("id", course_id);
-                in.putExtra("course_code", course);
-                in.putExtra("courses", coursesList);
-    			in.putExtra("lectures", lecturesList);
-    			in.putExtra("notes", notesList);
+                in.putExtra("course_code", course);               
  
                 // starting new activity 
                 startActivity(in);
@@ -134,8 +121,7 @@ public class AllCoursesActivity extends ListActivity {
 		@Override
 		protected String doInBackground(String... arg0) {
 
-			Database d = new Database(users_id, "");
-			userData = d.LoadAllUserData();
+			userData = Database.getInstance().LoadAllUserData();
 			
 			return null;
 		}
@@ -145,17 +131,10 @@ public class AllCoursesActivity extends ListActivity {
          * **/
         protected void onPostExecute(String file_url) {
             // dismiss the dialog after getting all data
-            pDialog.dismiss();
-            
-            //Check if we have the courses, lectures, and notes for the user.
-            if(userData.size() == 3){          	
+            pDialog.dismiss();                    	
     			
-    			coursesList = userData.get(0);
-    			lecturesList = userData.get(1);
-    			notesList = userData.get(2);
-    			
-    			setCoursesListAdapter();
-            }           
+    		coursesList = userData.get(0);   			
+    		setCoursesListAdapter();                     
         }
 	}
 }

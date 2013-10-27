@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -34,8 +33,7 @@ public class FlashcardActivity extends Activity{
 	private ProgressDialog pDialog;
 	
 	private String lectureID;
-	private String courseName;
-	private String users_id;	 
+	private String courseName;		 
     
     ArrayList<HashMap<String, String>> selectedNotes = new ArrayList<HashMap<String,String>>();
     
@@ -46,7 +44,6 @@ public class FlashcardActivity extends Activity{
     
     private GestureDetectorCompat gestureDetector;   
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {		
 		super.onCreate(savedInstanceState);
@@ -55,14 +52,13 @@ public class FlashcardActivity extends Activity{
 		
 		// getting lecture details from intent
 		Intent i = getIntent();
-        
-        coursesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("courses");
-        lecturesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("lectures");
-        notesList = (ArrayList<HashMap<String, String>>) i.getSerializableExtra("notes"); 
+		
+		userData = Database.getInstance().getUserData();
+		
+		notesList = userData.get(2);        
         
         lectureID = i.getStringExtra("id");
-        courseName = i.getStringExtra("name");
-        users_id = i.getStringExtra("users_id");
+        courseName = i.getStringExtra("name");       
         
 		setTitle(courseName + " Flashcards");
 		setContentView(R.layout.flashcard);	
@@ -70,10 +66,7 @@ public class FlashcardActivity extends Activity{
 		gestureDetector = new GestureDetectorCompat(this, new GestureListener());
 		
 		animFadeIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in);
-		animFadeOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);		
-		
-		//animFadeIn.setAnimationListener((AnimationListener) this);
-		//animFadeOut.setAnimationListener((AnimationListener) this);		
+		animFadeOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);			
 		
 		relativeLayout = (RelativeLayout) findViewById(R.id.flashcardParentView);
 		keyword = (TextView) findViewById(R.id.keyword);
@@ -184,11 +177,11 @@ public class FlashcardActivity extends Activity{
 			
 			flashcardPosition = selectedNotes.size() - 1;
 			
-			keyword.setText(notesList.get(flashcardPosition).get("term"));
+			keyword.setText(selectedNotes.get(flashcardPosition).get("term"));
 			keyword.startAnimation(animFadeIn);	    	
 		}else if(selectedNotes.size() != 0){		
 			
-			keyword.setText(notesList.get(flashcardPosition).get("term"));
+			keyword.setText(selectedNotes.get(flashcardPosition).get("term"));
 			keyword.startAnimation(animFadeIn);	    	
 		}else {
 			
@@ -203,12 +196,12 @@ public class FlashcardActivity extends Activity{
     	
     	if(flashcardPosition < selectedNotes.size()){
     		
-    		keyword.setText(notesList.get(flashcardPosition).get("term"));
+    		keyword.setText(selectedNotes.get(flashcardPosition).get("term"));
     		keyword.startAnimation(animFadeIn);	    	
     	}else if(selectedNotes.size() != 0){
     		
     		flashcardPosition = 0;    		
-    		keyword.setText(notesList.get(flashcardPosition).get("term"));
+    		keyword.setText(selectedNotes.get(flashcardPosition).get("term"));
     		keyword.startAnimation(animFadeIn);	    	
     	}else{
     		
@@ -227,13 +220,13 @@ public class FlashcardActivity extends Activity{
     		if(definition.getText().equals("")){    			
     			
     			keyword.setText("");
-    			definition.setText(notesList.get(flashcardPosition).get("definition"));
+    			definition.setText(selectedNotes.get(flashcardPosition).get("definition"));
     			keyword.startAnimation(animFadeOut);    			
     			definition.startAnimation(animFadeIn);   			
     			
     		}else if(keyword.getText().equals("")){
     			
-    			keyword.setText(notesList.get(flashcardPosition).get("term"));
+    			keyword.setText(selectedNotes.get(flashcardPosition).get("term"));
     			definition.setText("");
     			definition.startAnimation(animFadeOut);
     			keyword.startAnimation(animFadeIn); 			
@@ -282,8 +275,7 @@ public class FlashcardActivity extends Activity{
 		@Override
 		protected String doInBackground(String... arg0) {
 
-			Database d = new Database(users_id, "");
-			userData = d.LoadAllUserData();
+			userData = Database.getInstance().LoadAllUserData();
 			
 			return null;
 		}
@@ -293,19 +285,27 @@ public class FlashcardActivity extends Activity{
          * **/
         protected void onPostExecute(String file_url) {
             // dismiss the dialog after getting all data
-            pDialog.dismiss();
+            pDialog.dismiss();           
             
-            //Check if we have the courses, lectures, and notes for the user.
-            if(userData.size() == 3){
+    		notesList = userData.get(2);
+    		
+    		selectedNotes.clear();
+    		definition.setText("");
+    		keyword.setText("");
+    		
+    		getNotesFromSelectedLecture();
+    		setFirstFlashCard();
+    			
+    		//setCoursesListAdapter();
             	
-            	Intent i = new Intent(getApplicationContext(), AllCoursesActivity.class);
-    			i.putExtra("users_id", users_id);
-    			i.putExtra("courses", userData.get(0));
-    			i.putExtra("lectures", userData.get(1));
-    			i.putExtra("notes", userData.get(2));
-    			startActivity(i);
-    			finish();   			
-            }           
+            /*Intent i = new Intent(getApplicationContext(), AllCoursesActivity.class);
+    		i.putExtra("api_key", api_key);
+    		i.putExtra("courses", userData.get(0));
+    		i.putExtra("lectures", userData.get(1));
+    		i.putExtra("notes", userData.get(2));
+    		startActivity(i);
+    		finish(); */  			
+                       
         }
 	}
 
