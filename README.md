@@ -1,4 +1,4 @@
-Flashcards
+TogoNotes
 ==========
 
 COP4331
