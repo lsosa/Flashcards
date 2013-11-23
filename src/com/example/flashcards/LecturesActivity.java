@@ -2,7 +2,7 @@ package com.example.flashcards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import android.annotation.SuppressLint;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -16,11 +16,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
-
 import com.togonotes.flashcards.R;
 
 
@@ -92,7 +89,7 @@ public class LecturesActivity extends ListActivity{
             }
         });
         
-        inputSearch.addTextChangedListener(new TextWatcher() {
+        inputSearch.addTextChangedListener(new TextWatcher() {			
 			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
