@@ -134,8 +134,8 @@ public class Database{
                 
                 
             } else {
-                // no courses found            	
-                
+                            	
+                api_key = "";
             }
         } catch (JSONException e) {
             e.printStackTrace();
