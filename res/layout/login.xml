@@ -51,10 +51,10 @@
         android:id="@+id/bSubmitLogin"
         android:text="Login"
         android:textColor="@android:color/black"               
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="30dp"
         android:layout_below="@+id/userPassword" />
     
 

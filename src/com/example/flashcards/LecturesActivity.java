@@ -2,20 +2,25 @@ package com.example.flashcards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+
 import com.togonotes.flashcards.R;
 
 
@@ -27,6 +32,9 @@ public class LecturesActivity extends ListActivity{
 	
 	private ProgressDialog pDialog;
 	
+	LecturesAdapter adapter;
+	EditText inputSearch;
+	
 	ArrayList<HashMap<String, String>> selectedCourseLectures = new ArrayList<HashMap<String, String>>();
 	
 	ArrayList<ArrayList<HashMap<String, String>>> userData;	
@@ -36,7 +44,9 @@ public class LecturesActivity extends ListActivity{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.all_courses);
+        setContentView(R.layout.all_lectures);
+        
+        inputSearch = (EditText) findViewById(R.id.lecturesInputSearch);
         
         userData = new ArrayList<ArrayList<HashMap<String,String>>>();
         
@@ -78,6 +88,47 @@ public class LecturesActivity extends ListActivity{
                 startActivity(in);
             }
         });
+        
+        inputSearch.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				
+				if(!s.toString().equals("")){
+					
+					ArrayList<HashMap<String, String>> filterLectures = new ArrayList<HashMap<String,String>>();
+					//HashMap<String, String> mapFilter = new HashMap<String, String>();
+					for(int i = 0; i < selectedCourseLectures.size(); i++){
+						
+						if(selectedCourseLectures.get(i).get("name").toLowerCase().contains(String.valueOf(s).toLowerCase())){
+							
+							//mapFilter.put("course_code", coursesList.get(i).get("course_code"));
+							filterLectures.add(selectedCourseLectures.get(i));
+						}
+					}				
+					
+					adapter = new LecturesAdapter(LecturesActivity.this, R.layout.list_item, filterLectures);
+					setListAdapter(adapter);
+				}else{
+					
+					adapter = new LecturesAdapter(LecturesActivity.this, R.layout.list_item, selectedCourseLectures);
+					setListAdapter(adapter);
+				}
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				
+				
+			}
+		});
  
     }
     
@@ -97,11 +148,13 @@ public class LecturesActivity extends ListActivity{
 	
 				@Override
 				public void run() {
-					ListAdapter adapter = new SimpleAdapter(
+					/*ListAdapter adapter = new SimpleAdapter(
 							LecturesActivity.this, selectedCourseLectures,
 							R.layout.list_item, new String[] { "id", "name", "description" }, 
-							new int[] {R.id.elementID, R.id.elementTitle, R.id.elementSubTitle });
-	
+							new int[] {R.id.elementID, R.id.elementTitle, R.id.elementSubTitle });*/
+					
+					adapter = new LecturesAdapter(LecturesActivity.this, R.layout.list_item, selectedCourseLectures);
+					
 					// updating listview
 					setListAdapter(adapter);
 				}

@@ -2,20 +2,23 @@ package com.example.flashcards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
+
 import com.togonotes.flashcards.R;
  
 public class AllCoursesActivity extends ListActivity {
@@ -25,10 +28,15 @@ public class AllCoursesActivity extends ListActivity {
     
     private ProgressDialog pDialog; 
     
+    EditText inputSearch;
+    CoursesAdapter adapter;
+    
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.all_courses);
+        
+        inputSearch = (EditText) findViewById(R.id.coursesInputSearch);
         
         userData = new ArrayList<ArrayList<HashMap<String,String>>>();       
         
@@ -61,6 +69,48 @@ public class AllCoursesActivity extends ListActivity {
                 startActivity(in);
             }
         });
+        
+        inputSearch.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				
+				if(!s.toString().equals("")){
+					
+					ArrayList<HashMap<String, String>> filterCourses = new ArrayList<HashMap<String,String>>();
+					//HashMap<String, String> mapFilter = new HashMap<String, String>();
+					for(int i = 0; i < coursesList.size(); i++){
+						
+						if(coursesList.get(i).get("course_code").toLowerCase().contains(String.valueOf(s).toLowerCase())){
+							
+							//mapFilter.put("course_code", coursesList.get(i).get("course_code"));
+							filterCourses.add(coursesList.get(i));
+						}
+					}				
+					
+					adapter = new CoursesAdapter(AllCoursesActivity.this, R.layout.list_item, filterCourses);
+					setListAdapter(adapter);
+				}else{
+					
+					adapter = new CoursesAdapter(AllCoursesActivity.this, R.layout.list_item, coursesList);
+					setListAdapter(adapter);
+				}
+				
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				
+				
+			}
+		});
  
     }
     
@@ -70,13 +120,15 @@ public class AllCoursesActivity extends ListActivity {
 			
 			@Override
 			public void run() {
-				ListAdapter adapter = new SimpleAdapter(
+					/*adapter = new ArrayAdapter(
 		                AllCoursesActivity.this, coursesList,
 		                R.layout.list_item, new String[] { "id", "course_code", "friendly_name"},
-		                new int[] { R.id.elementID, R.id.elementTitle, R.id.elementSubTitle });
+		                new int[] { R.id.elementID, R.id.elementTitle, R.id.elementSubTitle });*/
+				
+				adapter = new CoursesAdapter(AllCoursesActivity.this, R.layout.list_item, coursesList);
 				
 				// updating listview
-		        setListAdapter(adapter);
+		        setListAdapter(adapter);				
 			}
 		});
     }

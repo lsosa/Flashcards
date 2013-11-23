@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >  
+    android:layout_height="match_parent" > 
+    
+    <!-- Editext for Search -->
+    <EditText android:id="@+id/lecturesInputSearch"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:hint="Search Lectures.."
+        android:inputType="textVisiblePassword"/>
 
     
     <ListView
-        android:id="@android:id/list"
-        android:layout_alignParentTop="true"        
+        android:id="@android:id/list"        
+        android:layout_below="@id/lecturesInputSearch"        
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"/>    
     

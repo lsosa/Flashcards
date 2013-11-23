@@ -2,12 +2,14 @@ package com.example.flashcards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
+import android.util.TypedValue;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,18 +17,21 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.RelativeLayout;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.togonotes.flashcards.R;
 
 public class FlashcardActivity extends Activity{
 	
 	TextView keyword;
 	TextView definition;
+	Button checkbox;
 	
 	Animation animFadeIn, animFadeOut;
 	
-	RelativeLayout relativeLayout;
+	LinearLayout linearLayout;
 	
 	private int flashcardPosition = 0;	
 	
@@ -68,22 +73,69 @@ public class FlashcardActivity extends Activity{
 		animFadeIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in);
 		animFadeOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);			
 		
-		relativeLayout = (RelativeLayout) findViewById(R.id.flashcardParentView);
+		linearLayout = (LinearLayout) findViewById(R.id.flashcardParentView);
 		keyword = (TextView) findViewById(R.id.keyword);
 		definition = (TextView) findViewById(R.id.definition);
+		checkbox = (Button) findViewById(R.id.checkBox1);
 		
 		definition.setVisibility(View.INVISIBLE);
 		
 		getNotesFromSelectedLecture();
 		setFirstFlashCard();
 		
-		setOnTouchForRelativeLayout();
+		setOnTouchForLinearLayout();
+		
+		checkbox.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {			
+
+				selectedNotes.remove(flashcardPosition);
+				
+				if(selectedNotes.size() > 0){
+
+					flashcardPosition--;
+					definition.setText("");
+
+					if (flashcardPosition < 0 && selectedNotes.size() != 0) {
+
+						flashcardPosition = selectedNotes.size() - 1;
+
+						keyword.setText(selectedNotes.get(flashcardPosition).get("term"));
+						keyword.startAnimation(animFadeIn);
+					} else if (selectedNotes.size() != 0) {
+
+						keyword.setText(selectedNotes.get(flashcardPosition).get("term"));
+						keyword.startAnimation(animFadeIn);
+					} else {
+
+						flashcardPosition = 0;
+					}
+
+					// Toast.makeText(getApplicationContext(), "Ok is checked!",
+					// Toast.LENGTH_LONG).show();					
+				}else{
+					
+					if(definition.getText().equals("")){
+						
+						keyword.setText("You know everything. Go back to reset.");
+					}else{							
+						
+						definition.setText("You know everything. Go back to reset.");
+						definition.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+					}					
+					
+					checkbox.setVisibility(View.INVISIBLE);
+				}
+			} 
+		});		
+			
 		
 	}
 	
-	private void setOnTouchForRelativeLayout(){
+	private void setOnTouchForLinearLayout(){
 		
-		relativeLayout.setOnTouchListener(new View.OnTouchListener() {
+		linearLayout.setOnTouchListener(new View.OnTouchListener() {
 			
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {				
@@ -113,6 +165,7 @@ public class FlashcardActivity extends Activity{
 	    	//definition.setText(selectedNotes.get(0).get("definition"));
 		}else{
 			
+			checkbox.setVisibility(4);
 			keyword.setText("No Notes :(");
 			definition.setText("Go and create some notes so that you can study!");
 		}

@@ -1,13 +1,12 @@
 package com.example.flashcards;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
-import android.view.Menu;
 import android.widget.Button;
 import android.widget.TextView;
 import android.view.View;
-import android.widget.Toast;
 import com.togonotes.flashcards.R;
 
 
@@ -15,6 +14,8 @@ public class MainActivity extends Activity {
 	
 	TextView tvTitle;
 	Button bLogin, bRegister;
+	
+	String registerURL = "http://togonotes.com/account/login";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,9 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
-				Toast.makeText(getApplicationContext(), "Not Implemented yet!", Toast.LENGTH_LONG).show();
+				Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setData(Uri.parse(registerURL));
+				startActivity(i);
 			}
 		});
 	}
