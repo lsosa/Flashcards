@@ -60,7 +60,10 @@ public class FlashcardActivity extends Activity{
 		
 		userData = Database.getInstance().getUserData();
 		
-		notesList = userData.get(2);        
+		if(userData.size() > 2){
+			
+			notesList = userData.get(2);
+		}		        
         
         lectureID = i.getStringExtra("id");
         courseName = i.getStringExtra("name");       
@@ -340,7 +343,10 @@ public class FlashcardActivity extends Activity{
             // dismiss the dialog after getting all data
             pDialog.dismiss();           
             
-    		notesList = userData.get(2);
+            if(userData.size() > 2){
+    			
+    			notesList = userData.get(2);
+    		}
     		
     		selectedNotes.clear();
     		definition.setText("");

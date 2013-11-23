@@ -54,7 +54,10 @@ public class LecturesActivity extends ListActivity{
         
         userData = Database.getInstance().getUserData();
         
-        lecturesList = userData.get(1);       
+        if(userData.size() > 2){
+        	
+        	lecturesList = userData.get(1);
+        }               
         
         course_id = i.getStringExtra("id");
         course_code = i.getStringExtra("course_code");        
@@ -217,7 +220,10 @@ public class LecturesActivity extends ListActivity{
             // dismiss the dialog after getting all data
             pDialog.dismiss();          
             
-    		lecturesList = userData.get(1);   		
+            if(userData.size() > 2){
+            	
+            	lecturesList = userData.get(1);
+            }   		
     		selectedCourseLectures.clear();   		
     		displayLectures();                      
         }

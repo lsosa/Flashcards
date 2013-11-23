@@ -42,7 +42,10 @@ public class AllCoursesActivity extends ListActivity {
         
         userData = Database.getInstance().getUserData();
         
-        coursesList = userData.get(0);           
+        if(userData.size() > 2){
+        	
+        	coursesList = userData.get(0);
+        }                   
         
         setCoursesListAdapter();              
  
@@ -185,7 +188,10 @@ public class AllCoursesActivity extends ListActivity {
             // dismiss the dialog after getting all data
             pDialog.dismiss();                    	
     			
-    		coursesList = userData.get(0);   			
+            if(userData.size() > 2){
+            	
+            	coursesList = userData.get(0);
+            }   			
     		setCoursesListAdapter();                     
         }
 	}
