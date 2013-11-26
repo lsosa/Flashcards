@@ -1,6 +1,7 @@
 package com.example.flashcards;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import android.app.ListActivity;
@@ -45,6 +46,7 @@ public class AllCoursesActivity extends ListActivity {
         if(userData.size() > 2){
         	
         	coursesList = userData.get(0);
+        	Collections.reverse(coursesList);
         }                   
         
         setCoursesListAdapter();              
@@ -89,7 +91,7 @@ public class AllCoursesActivity extends ListActivity {
 							//mapFilter.put("course_code", coursesList.get(i).get("course_code"));
 							filterCourses.add(coursesList.get(i));
 						}
-					}				
+					}
 					
 					adapter = new CoursesAdapter(AllCoursesActivity.this, R.layout.list_item, filterCourses);
 					setListAdapter(adapter);

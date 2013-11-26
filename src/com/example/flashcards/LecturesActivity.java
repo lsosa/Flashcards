@@ -1,6 +1,7 @@
 package com.example.flashcards;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import android.annotation.SuppressLint;
 import android.app.ListActivity;
@@ -141,6 +142,8 @@ public class LecturesActivity extends ListActivity{
     			selectedCourseLectures.add(lecturesList.get(i));
     		}
     	}
+    	//reverse lecture list
+    	Collections.reverse(selectedCourseLectures);
     	
     	if(selectedCourseLectures.size() != 0){
     		
