@@ -96,8 +96,7 @@ public class FlashcardActivity extends Activity{
 				selectedNotes.remove(flashcardPosition);
 				
 				if(selectedNotes.size() > 0){
-
-					flashcardPosition++;
+					
 			    	definition.setText("");    	   	
 			    	
 			    	if(flashcardPosition < selectedNotes.size()){
