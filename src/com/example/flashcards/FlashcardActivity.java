@@ -97,23 +97,22 @@ public class FlashcardActivity extends Activity{
 				
 				if(selectedNotes.size() > 0){
 
-					flashcardPosition--;
-					definition.setText("");
-
-					if (flashcardPosition < 0 && selectedNotes.size() != 0) {
-
-						flashcardPosition = selectedNotes.size() - 1;
-
-						keyword.setText(selectedNotes.get(flashcardPosition).get("term"));
-						keyword.startAnimation(animFadeIn);
-					} else if (selectedNotes.size() != 0) {
-
-						keyword.setText(selectedNotes.get(flashcardPosition).get("term"));
-						keyword.startAnimation(animFadeIn);
-					} else {
-
-						flashcardPosition = 0;
-					}
+					flashcardPosition++;
+			    	definition.setText("");    	   	
+			    	
+			    	if(flashcardPosition < selectedNotes.size()){
+			    		
+			    		keyword.setText(selectedNotes.get(flashcardPosition).get("term"));
+			    		keyword.startAnimation(animFadeIn);	    	
+			    	}else if(selectedNotes.size() != 0){
+			    		
+			    		flashcardPosition = 0;    		
+			    		keyword.setText(selectedNotes.get(flashcardPosition).get("term"));
+			    		keyword.startAnimation(animFadeIn);	    	
+			    	}else{
+			    		
+			    		flashcardPosition = 0;
+			    	}
 
 					// Toast.makeText(getApplicationContext(), "Ok is checked!",
 					// Toast.LENGTH_LONG).show();					
