@@ -110,6 +110,20 @@ public class Database{
 		return formatter.format(last_refresh);
 	}
 	
+	public void resetLastRefresh(){
+		
+		try {
+			last_refresh = formatter.parse("2000-03-13 16:23:05");
+		} catch (ParseException e) {			
+			e.printStackTrace();
+		}
+	}
+	
+	public void resetAPIKey(){
+		
+		api_key = "";
+	}
+	
 	public ArrayList<ArrayList<HashMap<String, String>>> getUserData(){
 		
 		return userData;

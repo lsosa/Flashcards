@@ -61,7 +61,7 @@ public class LoginActivity extends Activity{
 			}
 		});
 	}
-	
+
 	private class AuthUser extends AsyncTask<String, String, String>{
 		
 		@Override
@@ -126,11 +126,13 @@ public class LoginActivity extends Activity{
          * **/
         protected void onPostExecute(String file_url) {
             // dismiss the dialog after getting all data
-            pDialog.dismiss();         
+            pDialog.dismiss();
+            userName.setText("");
+    		userPassword.setText("");
             	
             Intent i = new Intent(getApplicationContext(), AllCoursesActivity.class);   		
     		startActivity(i);
-    		finish();                      
+    		//finish();                      
         }
 	}
 	

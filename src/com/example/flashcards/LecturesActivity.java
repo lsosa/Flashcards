@@ -3,6 +3,7 @@ package com.example.flashcards;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+
 import android.annotation.SuppressLint;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -19,6 +20,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.togonotes.flashcards.R;
 
 
@@ -185,6 +187,14 @@ public class LecturesActivity extends ListActivity{
     			new refreshUserData().execute();
     			
     			return true;
+    			
+    		case R.id.action_logout:
+    			
+    			Intent i = new Intent(getApplicationContext(), LoginActivity.class);   		
+        		startActivity(i);
+        		finish();
+        		
+        		return true;
     		default:
     			return super.onOptionsItemSelected(item);    		
     	}		

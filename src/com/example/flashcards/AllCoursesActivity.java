@@ -22,12 +22,12 @@ import android.widget.TextView;
 
 import com.togonotes.flashcards.R;
  
-public class AllCoursesActivity extends ListActivity {
+public class AllCoursesActivity extends ListActivity {	
 
 	ArrayList<ArrayList<HashMap<String, String>>> userData;
 	ArrayList<HashMap<String, String>> coursesList;   
     
-    private ProgressDialog pDialog; 
+    private ProgressDialog pDialog;    
     
     EditText inputSearch;
     CoursesAdapter adapter;
@@ -37,7 +37,7 @@ public class AllCoursesActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.all_courses);
         
-        inputSearch = (EditText) findViewById(R.id.coursesInputSearch);
+        inputSearch = (EditText) findViewById(R.id.coursesInputSearch);        
         
         userData = new ArrayList<ArrayList<HashMap<String,String>>>();       
         
@@ -155,6 +155,14 @@ public class AllCoursesActivity extends ListActivity {
     			new refreshUserData().execute();
     			
     			return true;
+    			
+    		case R.id.action_logout:
+    			
+    			Intent i = new Intent(getApplicationContext(), LoginActivity.class);   		
+        		startActivity(i);
+        		finish();
+        		
+        		return true;
     		default:
     			return super.onOptionsItemSelected(item);    		
     	}		
@@ -196,5 +204,19 @@ public class AllCoursesActivity extends ListActivity {
             }   			
     		setCoursesListAdapter();                     
         }
+	}
+    
+    @Override
+	protected void onDestroy() {
+		
+		super.onDestroy();
+		
+		Database.getInstance().coursesList.clear();
+		Database.getInstance().lecturesList.clear();
+		Database.getInstance().notesList.clear();
+		Database.getInstance().userData.clear();
+		
+		Database.getInstance().resetLastRefresh();
+		Database.getInstance().resetAPIKey();		
 	}
 }

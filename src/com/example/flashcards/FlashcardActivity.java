@@ -306,6 +306,14 @@ public class FlashcardActivity extends Activity{
 				new refreshUserData().execute();
 				
     			return true;
+    			
+    		case R.id.action_logout:
+    			
+    			Intent i = new Intent(getApplicationContext(), LoginActivity.class);   		
+        		startActivity(i);
+        		finish();
+        		
+        		return true;
     		default:
     			return super.onOptionsItemSelected(item);    		
     	}		
